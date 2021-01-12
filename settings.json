@@ -1,0 +1,9 @@
+{
+    "port": 3011,
+    "database": {
+        "host": "localhost",
+        "dbname": "chat",
+        "user": "root",
+        "pass": "root"
+    }
+}
