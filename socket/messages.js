@@ -12,7 +12,16 @@ module.exports = (socket, io) => {
             senderId: data.user,
             dialogId: data.room
         })
+
         io.to(createdMessage.dialogId).emit('messageReceived', {
+            id: createdMessage.id,
+            time: createdMessage.time,
+            text: createdMessage.text,
+            senderId: createdMessage.senderId,
+            dialogId: createdMessage.dialogId
+        })
+
+        socket.broadcast.emit('emitToNotSelectedDialog', {
             id: createdMessage.id,
             time: createdMessage.time,
             text: createdMessage.text,

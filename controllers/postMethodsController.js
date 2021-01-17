@@ -9,11 +9,23 @@ const
     { Op } = require('sequelize');
 
 async function Login(req, res) {
+    let io = req.app.locals.io;
     let user = await User.findOne({ where: { login: req.body.login, password: req.body.password } })
 
     if (user == null) {
         return res.status(404).end();
     }
+
+    await User.update({ status: 1 }, {
+        where: {
+            id: user.id
+        }
+    });
+
+    io.emit('otherUserStatusChanged', {
+        id: user.id,
+        status: 1
+    })
 
     let token = md5(user.id + moment().valueOf());
 
@@ -35,6 +47,8 @@ async function Login(req, res) {
 }
 
 async function RegUser(req, res) {
+    let io = req.app.locals.io;
+
     let user = await User.create({
         name: req.body.name,
         lastName: req.body.lastName,
@@ -50,6 +64,8 @@ async function RegUser(req, res) {
         }
     })
 
+    let emmitedData = [];
+
     for await (let otherUser of otherUsers) {
         let createdDialog = await Dialog.create();
 
@@ -63,19 +79,29 @@ async function RegUser(req, res) {
             userId: user.id
         })
 
-        await Message.create({
+        let createdMessage = await Message.create({
             time: Date.now(),
             text: 'Start of conversation',
             senderId: 0,
             dialogId: createdDialog.id,
             messageType: 'adminMessage'
         })
+
+        emmitedData.push({
+            id: createdDialog.id,
+            innerUser: otherUser,
+            user: user,
+            message: createdMessage
+        })
     }
+
+    io.emit('userRegistered', emmitedData)
 
     return res.status(200).end();
 }
 
 async function CheckToken(req, res) {
+    let io = req.app.locals.io;
     let token = await Session.findOne({
         where: {
             token: req.body.token
@@ -89,6 +115,17 @@ async function CheckToken(req, res) {
     if (moment().valueOf() > moment(token.expiresIn).valueOf()) {
         return res.status(400).end();
     }
+
+    await User.update({ status: 1 }, {
+        where: {
+            id: token.userId
+        }
+    });
+
+    io.emit('otherUserStatusChanged', {
+        id: token.userId,
+        status: 1
+    })
 
     return res.status(200).send();
 }

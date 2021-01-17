@@ -39,9 +39,11 @@ async function getAllDialogs(req, res) {
         resultedArr.push({
             id: dialogUser.dialogId,
             innerUser: {
+                id: innerUser.id,
                 name: innerUser.name,
                 lastName: innerUser.lastName,
-                login: innerUser.login
+                login: innerUser.login,
+                status: innerUser.status
             },
             message: lastMessage
         })

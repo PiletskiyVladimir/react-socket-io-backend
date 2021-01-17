@@ -1,5 +1,5 @@
 const
-    { DataTypes, Model, INTEGER, STRING } = require('sequelize'),
+    { DataTypes, Model, INTEGER, STRING, TINYINT } = require('sequelize'),
     sequelize = require('../db');
 
 class User extends Model {}
@@ -21,6 +21,9 @@ User.init({
     },
     password: {
         type: STRING(255)
+    },
+    status: {
+        type: TINYINT(1)
     }
 }, {
     sequelize,

@@ -49,4 +49,7 @@ const io = require('socket.io')(server, {
 io.on('connection', socket => {
     require('./socket/dialogs')(socket, io);
     require('./socket/messages')(socket, io);
+    require('./socket/users')(socket, io);
 });
+
+app.locals.io = io;
