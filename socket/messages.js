@@ -10,7 +10,8 @@ module.exports = (socket, io) => {
             time: Date.now(),
             text: data.message,
             senderId: data.user,
-            dialogId: data.room
+            dialogId: data.room,
+            messageType: 'userMessage'
         })
 
         io.to(createdMessage.dialogId).emit('messageReceived', {
